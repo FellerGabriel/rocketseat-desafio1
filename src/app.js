@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const { uuid } = require("uuidv4");
+const { isUuid } = require("uuidv4");
+
 
 const app = express();
 
@@ -10,6 +12,7 @@ app.use(cors());
 const repositories = [];
 
 app.get("/repositories", (request, response) => {
+
   return response.json(repositories);
 });
 
@@ -25,45 +28,33 @@ app.post("/repositories", (request, response) => {
 });
 
 app.put("/repositories/:id", (request, response) => {
-  const { id } = request.params;
-  const { title, url, techs } = request.body;
+	const { title, url, techs, likes } = request.body;
+	const { id } = request.params;
 
-  repositorieIndex = repositories.findIndex(
-    (repositories) => repositories.id == id
-  );
-
-  if (repositorieIndex < 0) {
-    return response
-      .status(400)
-      .json({ error: "Deu Ruim, não tem esse id naum" });
+  if(likes > 0){
+	  return response.json({"likes":0})
   }
 
-  const { likes } = repositories.find((repositories) => repositories.id == id);
+  repositorieIndex = repositories.findIndex((repositories) => repositories.id == id);
 
-  const updatedRepositorie = {
-    id,
-    title,
-    url,
-    techs,
-    likes,
-  };
+  if (repositorieIndex < 0) {
+    return response.status(400).json({ error: "Deu Ruim, não tem esse id naum" });
+  }
+  
+  const updatedRepositorie = {title,url,techs};
 
   repositories[repositorieIndex] = updatedRepositorie;
 
-  return response.json([updatedRepositorie]);
+  return response.json(updatedRepositorie);
 });
 
 app.delete("/repositories/:id", (request, response) => {
   const { id } = request.params;
 
-  repositorieIndex = repositories.findIndex(
-    (repositorie) => repositorie.id == id
-  );
+  repositorieIndex = repositories.findIndex((repositorie) => repositorie.id == id);
 
   if (repositorieIndex < 0) {
-    return response
-      .status(400)
-      .json({ error: "Deu Ruim, não tem esse id naum" });
+    return response.status(400).json({ error: "Deu Ruim, não tem esse id naum" });
   }
 
   repositories.splice(repositorieIndex, 1);
@@ -72,27 +63,22 @@ app.delete("/repositories/:id", (request, response) => {
 });
 
 app.post("/repositories/:id/like", (request, response) => {
-  const { id } = request.params;
+  const { id } = request.params
 
-  repositorieIndex = repositories.findIndex(
-    (repositorie) => repositorie.id == id
-  );
-
+  repositorieIndex = repositories.findIndex((repositorie) => repositorie.id == id);
+ 
   if (repositorieIndex < 0) {
-    return response
-      .status(400)
-      .json({ error: "Deu Ruim, não tem esse id naum" });
+    return response.status(400).json({ error: "Deu Ruim, não tem esse id naum" });
   }
 
-  const repositorie = repositories.find(
-    (repositories) => repositories.id == id
-  );
-
-  repositorie.likes++;
+  const repositorie = repositories.find((repositories) => repositories.id == id);
+  
+  repositorie.likes ++
 
   repositories[repositorieIndex] = repositorie;
+  
+  return response.json(repositorie)
 
-  return response.json(reposi);
 });
 
 module.exports = app;
