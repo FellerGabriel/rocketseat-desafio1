@@ -28,20 +28,16 @@ app.post("/repositories", (request, response) => {
 });
 
 app.put("/repositories/:id", (request, response) => {
-	const { title, url, techs, likes } = request.body;
+	const { title, url, techs } = request.body;
 	const { id } = request.params;
 
-  if(likes > 0){
-	  return response.json({"likes":0})
-  }
+  const repositorieIndex = repositories.findIndex((repositories) => repositories.id == id);
 
-  repositorieIndex = repositories.findIndex((repositories) => repositories.id == id);
-
-  if (repositorieIndex < 0) {
+  if (repositorieIndex == -1) {
     return response.status(400).json({ error: "Deu Ruim, não tem esse id naum" });
   }
   
-  const updatedRepositorie = {title,url,techs};
+  const updatedRepositorie = {id, title,url,techs, likes: repositories[repositorieIndex].likes};
 
   repositories[repositorieIndex] = updatedRepositorie;
 
